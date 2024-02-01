@@ -1,16 +1,17 @@
 module "environment" {
   source = "../../workspaces/stack_env"
 
-  resource_group_name   = "rg-${var.env_type}"
-  network_name          = "private-${var.env_type}-network"
+  resource_group_name = "rg-${var.env_type}"
+  network_name        = "private-${var.env_type}-network"
+
   network_address_space = var.network_address_space
-  network_dns_servers   = var.network_dns_servers
+  #  network_dns_servers   = var.network_dns_servers
   subnets = {
     "subnet-a" = {
-      address_prefixes = ["10.0.1.0/24"]
+      address_prefixes = ["10.0.0.0/19"]
     },
     "subnet-b" = {
-      address_prefixes = ["10.0.2.0/24"]
+      address_prefixes = ["10.0.32.0/19"]
     }
   }
 

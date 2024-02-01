@@ -1,14 +1,3 @@
-locals {
-  subnets = {
-    "subnet-a" = {
-      address_prefixes = ["10.0.1.0/24"]
-    },
-    "subnet-b" = {
-      address_prefixes = ["10.0.2.0/24"]
-    }
-  }
-}
-
 module "subnet" {
   source   = "../../modules/az_subnet"
   for_each = var.subnets
