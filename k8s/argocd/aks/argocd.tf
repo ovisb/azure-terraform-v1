@@ -8,9 +8,4 @@ resource "helm_release" "argo" {
   create_namespace = true
 
   values = [file("values/default.yaml")]
-
-  set {
-    name  = "server.service.type"
-    value = "LoadBalancer"
-  }
 }

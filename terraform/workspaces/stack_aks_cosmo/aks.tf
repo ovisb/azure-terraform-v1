@@ -1,13 +1,17 @@
-resource "azurerm_user_assigned_identity" "main" {
-  name                = "${var.aks_cluster_name}-main-identity"
+locals {
+  aks_cluster_name = "${var.project_name}-${var.env_type}-aks"
+}
+
+resource "azurerm_user_assigned_identity" "network" {
+  name                = "${local.aks_cluster_name}-network-identity"
   location            = data.azurerm_resource_group.main.location
   resource_group_name = data.azurerm_resource_group.main.name
 }
 
-resource "azurerm_role_assignment" "main" {
+resource "azurerm_role_assignment" "network" {
   scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Network Contributor"
-  principal_id         = azurerm_user_assigned_identity.main.principal_id
+  principal_id         = azurerm_user_assigned_identity.network.principal_id
 }
 
 resource "azurerm_role_assignment" "acr" {
@@ -18,16 +22,14 @@ resource "azurerm_role_assignment" "acr" {
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
-  name                    = var.aks_cluster_name
+  name                    = local.aks_cluster_name
   location                = data.azurerm_resource_group.main.location
   resource_group_name     = data.azurerm_resource_group.main.name
-  dns_prefix              = var.aks_cluster_name
+  dns_prefix              = local.aks_cluster_name
   private_cluster_enabled = false
-  node_resource_group     = var.aks_cluster_name
+  node_resource_group     = local.aks_cluster_name
 
-  oidc_issuer_enabled       = true
-  workload_identity_enabled = true
-  sku_tier                  = "Standard"
+  sku_tier = "Standard"
 
   network_profile {
     network_plugin = "azure"
@@ -36,10 +38,10 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   default_node_pool {
-    name    = "default"
-    vm_size = "Standard_D2_v2"
-    #    vnet_subnet_id = data.azurerm_subnet.subnet_a.id
-    node_count = 2
+    name           = "default"
+    vm_size        = "Standard_D2_v2"
+    vnet_subnet_id = data.azurerm_subnet.subnet_a.id
+    node_count     = 2
 
     node_labels = {
       role = "default"
@@ -48,14 +50,19 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.main.id]
+    identity_ids = [azurerm_user_assigned_identity.network.id]
+  }
+
+  # CSI driver
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
   }
 
   tags = {
     "Env_Type" = var.env_type
   }
 
-  depends_on = [azurerm_role_assignment.main]
+  depends_on = [azurerm_role_assignment.network]
 }
 
 

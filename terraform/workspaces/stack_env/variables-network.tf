@@ -9,19 +9,10 @@ variable "network_dns_servers" {
   default     = null
 }
 
-variable "network_name" {
-  type        = string
-  description = "Virtual Network name."
-}
-
-variable "resource_group_name" {
-  type        = string
-  description = "Virtual Network name."
-}
-
 variable "subnets" {
   type = map(object({
-    address_prefixes = list(string)
+    address_prefixes  = list(string)
+    service_endpoints = optional(list(string))
     })
   )
 

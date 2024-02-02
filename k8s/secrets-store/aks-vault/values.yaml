@@ -1,0 +1,6 @@
+vaultName: ""
+clientId: ""
+secrets: []
+tenantId: ""
+secrets-store-csi-driver:
+ enableSecretRotation: true

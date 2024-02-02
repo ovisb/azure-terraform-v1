@@ -1,7 +1,11 @@
-module "private_db_network" {
+locals {
+  network_name = "${var.project_name}-${var.env_type}-network"
+}
+
+module "network" {
   source = "../../modules/az_virtual_network"
 
-  name                = var.network_name
+  name                = local.network_name
   location            = var.location
   resource_group_name = module.resource_group.name
   address_space       = var.network_address_space
@@ -10,7 +14,11 @@ module "private_db_network" {
   tags = merge(
     var.tags,
     {
-      "Name" = var.network_name
+      "Name" = local.network_name
     }
   )
+}
+
+output "network_name" {
+  value = module.network.name
 }

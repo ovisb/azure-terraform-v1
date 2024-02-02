@@ -12,3 +12,8 @@ variable "tags" {
   type        = map(any)
   description = "Map of key value tag pair"
 }
+
+variable "project_name" {
+  type        = string
+  description = "Project name."
+}

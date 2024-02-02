@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deployment
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+        - name: busybox
+          image: busybox
+          command:
+            - "/bin/sleep"
+            - "10000"
+          volumeMounts:
+            - name: aks-vault-secrets
+              mountPath: "/mnt/aks-vault-secrets"
+              readOnly: true
+          env:
+            - name: COSMO_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: aks-vault-secret
+                  key: cosmoEndpoint
+      volumes:
+        - name: aks-vault-secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "aks-vault"

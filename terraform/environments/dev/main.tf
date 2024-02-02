@@ -1,14 +1,13 @@
 module "environment" {
   source = "../../workspaces/stack_env"
 
-  resource_group_name = "rg-${var.env_type}"
-  network_name        = "private-${var.env_type}-network"
+  project_name = "demo"
 
   network_address_space = var.network_address_space
-  #  network_dns_servers   = var.network_dns_servers
   subnets = {
     "subnet-a" = {
-      address_prefixes = ["10.0.0.0/19"]
+      address_prefixes  = ["10.0.0.0/19"],
+      service_endpoints = ["Microsoft.AzureCosmosDB"]
     },
     "subnet-b" = {
       address_prefixes = ["10.0.32.0/19"]
@@ -21,4 +20,21 @@ module "environment" {
   tags = {
     "Env_Type" = "dev"
   }
+}
+
+
+output "acr_name" {
+  value = module.environment.acr_name
+}
+
+output "acr_id" {
+  value = module.environment.acr_id
+}
+
+output "rg_name" {
+  value = module.environment.rg_name
+}
+
+output "network_name" {
+  value = module.environment.network_name
 }
